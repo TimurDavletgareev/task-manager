@@ -8,6 +8,7 @@ public class TaskSorter {
     public static Sort createSort(String sortBy) {
 
         Sort sort = switch (sortBy) {
+            case "id" -> Sort.unsorted();
             case "title" -> Sort.by("title");
             case "executor" -> Sort.by("executor_id");
             case "status" -> Sort.by("status");
