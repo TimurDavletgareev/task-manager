@@ -36,13 +36,13 @@ public class UserServiceImpl implements UserService {
 
         if (userRepository.findByNameOrEmail(newUserDto.getName(), newUserDto.getEmail()).isPresent()) {
 
-            log.info("- Такое имя или адрес почты уже есть в базе, пользователь не сохранён");
+            log.error("- Такое имя или адрес почты уже есть в базе, пользователь не сохранён");
             return false;
         }
 
         if (!newUserDto.getPassword().equals(newUserDto.getPasswordConfirm())) {
 
-            log.info("- Повторный пароль введен неверно, пользователь не сохранён");
+            log.error("- Повторный пароль введен неверно, пользователь не сохранён");
             return false;
         }
 
@@ -114,6 +114,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserFullDto getByName(String name) {
+
+        log.info("-- Возвращение пользователя с name={}", name);
+
+        UserFullDto fullDtoToReturn = UserMapper.modelToFullDto(userRepository.findByNameOrEmail(name, null)
+                .orElseThrow(() -> new NotFoundException(String.format("- Пользователь с name=%s не найден", name))));
+
+        log.info("-- Пользователь возвращён: {}", fullDtoToReturn);
+
+        return fullDtoToReturn;
+    }
+
+    @Override
     @Transactional
     public boolean removeById(Long userId) {
 
@@ -132,22 +145,4 @@ public class UserServiceImpl implements UserService {
 
         return true;
     }
-
-    @Override
-    public UserFullDto getByUsername(String name) {
-
-        log.info("-- Возвращение пользователя с name={}", name);
-
-        UserFullDto fullDtoToReturn = UserMapper.modelToFullDto(userRepository.findByNameOrEmail(name, null)
-                .orElseThrow(() -> new NotFoundException(String.format("- Пользователь с name=%s не найден", name))));
-
-        log.info("-- Пользователь возвращён: {}", fullDtoToReturn);
-
-        return fullDtoToReturn;
-    }
-
-    /*
-        Метод UserDetailsService
-     */
-
 }

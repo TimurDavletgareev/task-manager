@@ -206,10 +206,10 @@ public class TaskServiceImpl implements TaskService {
 
         log.info("-- Удаление задачи с id={}", taskId);
 
-        Task taskToUpdate = taskRepository.findById(taskId)
+        Task taskToRemove = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NotFoundException(String.format("- Задача с id=%d не найдена", taskId)));
 
-        Long authorId = taskToUpdate.getAuthor().getId();
+        Long authorId = taskToRemove.getAuthor().getId();
         if (!userId.equals(authorId)) {
             throw new ConflictOnRequestException(String.format(
                     "- id пользователя %d не совпадает с id автора задачи %d, задача не удалена", userId, authorId));
