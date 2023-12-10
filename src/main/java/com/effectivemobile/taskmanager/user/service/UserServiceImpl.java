@@ -10,31 +10,29 @@ import com.effectivemobile.taskmanager.user.repository.UserRepository;
 import com.effectivemobile.taskmanager.util.NullChecker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
     public boolean addUser(NewUserDto newUserDto) {
 
         log.info("-- Сохранение пользователя:{}", newUserDto);
-
-        if (newUserDto.getEmail() == null || newUserDto.getPassword() == null) {
-
-            log.info("- Отсутствует адрес почты или пароль, пользователь не сохранён");
-            return false;
-        }
 
         if (userRepository.findByNameOrEmail(newUserDto.getName(), newUserDto.getEmail()).isPresent()) {
 
@@ -55,6 +53,7 @@ public class UserServiceImpl implements UserService {
         } else {
             userToSave.setName(newUserDto.getEmail());
         }
+
         userToSave.setEmail(newUserDto.getEmail());
         userToSave.setPassword(passwordEncoder.encode(newUserDto.getPassword()));
 
@@ -92,7 +91,7 @@ public class UserServiceImpl implements UserService {
 
         NullChecker.setIfNotNull(userToUpdate::setName, updateDto.getName());
         NullChecker.setIfNotNull(userToUpdate::setEmail, updateDto.getEmail());
-        NullChecker.setIfNotNull(userToUpdate::setPassword, passwordEncoder.encode(updateDto.getPassword()));
+        NullChecker.setIfNotNull(userToUpdate::setPassword, updateDto.getPassword());
 
         UserFullDto fullDtoToReturn = UserMapper.modelToFullDto(userRepository.save(userToUpdate));
 
@@ -133,5 +132,22 @@ public class UserServiceImpl implements UserService {
 
         return true;
     }
+
+    @Override
+    public UserFullDto getByUsername(String name) {
+
+        log.info("-- Возвращение пользователя с name={}", name);
+
+        UserFullDto fullDtoToReturn = UserMapper.modelToFullDto(userRepository.findByNameOrEmail(name, null)
+                .orElseThrow(() -> new NotFoundException(String.format("- Пользователь с name=%s не найден", name))));
+
+        log.info("-- Пользователь возвращён: {}", fullDtoToReturn);
+
+        return fullDtoToReturn;
+    }
+
+    /*
+        Метод UserDetailsService
+     */
 
 }
