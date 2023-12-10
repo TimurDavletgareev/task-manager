@@ -1,4 +1,4 @@
-package com.effectivemobile.taskmanager.security.controller;
+package com.effectivemobile.taskmanager.user.controller;
 
 
 import com.effectivemobile.taskmanager.security.dto.ResponseMessage;

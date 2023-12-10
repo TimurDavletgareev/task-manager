@@ -1,5 +1,8 @@
 package com.effectivemobile.taskmanager.task.controller;
 
+import com.effectivemobile.taskmanager.comment.dto.CommentFullDto;
+import com.effectivemobile.taskmanager.comment.dto.NewCommentDto;
+import com.effectivemobile.taskmanager.comment.service.CommentService;
 import com.effectivemobile.taskmanager.task.dto.NewTaskDto;
 import com.effectivemobile.taskmanager.task.dto.TaskFullDto;
 import com.effectivemobile.taskmanager.task.dto.TaskShortDto;
@@ -19,17 +22,18 @@ import java.util.List;
 public class TaskController {
 
     private final TaskService taskService;
+    private final CommentService commentService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public TaskFullDto addTask(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public TaskFullDto addTask(@RequestHeader("X-Author-User-Id") Long userId,
                                @RequestBody @Valid NewTaskDto newTaskDto) {
 
         return taskService.addTask(userId, newTaskDto);
     }
 
     @PatchMapping("/update/{taskId}")
-    public TaskFullDto updateTask(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public TaskFullDto updateTask(@RequestHeader("X-Author-User-Id") Long userId,
                                   @PathVariable @NotNull Long taskId,
                                   @RequestBody @Valid TaskUpdateDto taskUpdateDto) {
 
@@ -37,7 +41,7 @@ public class TaskController {
     }
 
     @PatchMapping("/status/{taskId}")
-    public TaskFullDto setTaskStatusByExecutor(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public TaskFullDto setTaskStatusByExecutor(@RequestHeader("X-Executor-User-Id") Long userId,
                                                @PathVariable @NotNull Long taskId,
                                                @RequestParam(value = "status") String newStatus) {
 
@@ -76,9 +80,24 @@ public class TaskController {
     }
 
     @DeleteMapping("/{taskId}")
-    public void removeById(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public void removeById(@RequestHeader("X-Author-User-Id") Long userId,
                            @PathVariable @NotNull Long taskId) {
 
         taskService.removeById(userId, taskId);
+    }
+
+    @PostMapping("/{taskId}/comment")
+    public CommentFullDto addComment(@PathVariable Long taskId,
+                                     @RequestHeader("X-Comment-User-Id") Long userId,
+                                     @RequestBody NewCommentDto newCommentDto) {
+
+        return commentService.addComment(taskId, userId, newCommentDto);
+    }
+
+    @DeleteMapping("/{commentId}/comment")
+    public void addComment(@PathVariable Long commentId,
+                           @RequestHeader("X-Comment-User-Id") Long userId) {
+
+        commentService.removeById(userId, commentId);
     }
 }

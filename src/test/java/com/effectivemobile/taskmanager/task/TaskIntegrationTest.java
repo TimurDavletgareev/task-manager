@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @Transactional
 @SpringBootTest(
         properties = "db.name=test",
-        webEnvironment = SpringBootTest.WebEnvironment.NONE)
+        webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class TaskIntegrationTest {
 
@@ -48,14 +48,14 @@ class TaskIntegrationTest {
                 new NewUserDto("user1", "user1@mail.com",
                         "user1Password", "user1Password");
         userService.addUser(newUser1);
-        user1 = userService.getByUsername(newUser1.getName());
+        user1 = userService.getByName(newUser1.getName());
         user1Id = user1.getId();
 
         NewUserDto newUser2 =
                 new NewUserDto("user2", "user2@mail.com",
                         "user2Password", "user2Password");
         userService.addUser(newUser2);
-        user2 = userService.getByUsername(newUser2.getName());
+        user2 = userService.getByName(newUser2.getName());
         user2Id = user2.getId();
 
         newTaskDto1 = new NewTaskDto("task1", "descr1", user2Id, "MID");

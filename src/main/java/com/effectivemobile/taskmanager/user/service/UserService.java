@@ -11,7 +11,7 @@ public interface UserService {
 
     UserFullDto getById(Long userId);
 
-    public boolean removeById(Long userId);
+    UserFullDto getByName(String name);
 
-    UserFullDto getByUsername(String name);
+    boolean removeById(Long userId);
 }
