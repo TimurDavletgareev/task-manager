@@ -5,12 +5,12 @@ import com.effectivemobile.taskmanager.task.dto.TaskFullDto;
 import com.effectivemobile.taskmanager.task.dto.TaskShortDto;
 import com.effectivemobile.taskmanager.task.dto.TaskUpdateDto;
 import com.effectivemobile.taskmanager.task.service.TaskService;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController

@@ -1,11 +1,12 @@
 package com.effectivemobile.taskmanager.task.model;
 
 import com.effectivemobile.taskmanager.user.model.User;
-import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import javax.persistence.*;
 
 @Entity
 @Table(name = "tasks")
