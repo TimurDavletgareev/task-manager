@@ -30,38 +30,40 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public boolean addUser(NewUserDto newUserDto) {
+    public UserFullDto addUser(NewUserDto newUserDto) {
 
         log.info("-- Сохранение пользователя:{}", newUserDto);
 
         if (userRepository.findByNameOrEmail(newUserDto.getName(), newUserDto.getEmail()).isPresent()) {
 
-            log.error("- Такое имя или адрес почты уже есть в базе, пользователь не сохранён");
-            return false;
+            throw new ConflictOnRequestException(
+                    "- Такое имя или адрес почты уже принадлежат другому пользователю, пользователь не сохранён");
         }
 
         if (!newUserDto.getPassword().equals(newUserDto.getPasswordConfirm())) {
 
-            log.error("- Повторный пароль введен неверно, пользователь не сохранён");
-            return false;
+            throw new ConflictOnRequestException(
+                    "- Повторный пароль введен неверно, пользователь не сохранён");
         }
 
         User userToSave = new User();
 
         if (newUserDto.getName() != null) {
+
             userToSave.setName(newUserDto.getName());
         } else {
+
             userToSave.setName(newUserDto.getEmail());
         }
 
         userToSave.setEmail(newUserDto.getEmail());
         userToSave.setPassword(passwordEncoder.encode(newUserDto.getPassword()));
 
-        UserFullDto fullDtoToShowInLog = UserMapper.modelToFullDto(userRepository.save(userToSave));
+        UserFullDto fullDtoToReturn = UserMapper.modelToFullDto(userRepository.save(userToSave));
 
-        log.info("-- Пользователь сохранён: {}", fullDtoToShowInLog);
+        log.info("-- Пользователь сохранён: {}", fullDtoToReturn);
 
-        return true;
+        return fullDtoToReturn;
     }
 
     @Override

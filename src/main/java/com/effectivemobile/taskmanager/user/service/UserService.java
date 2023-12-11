@@ -5,7 +5,7 @@ import com.effectivemobile.taskmanager.user.dto.UserFullDto;
 
 public interface UserService {
 
-    boolean addUser(NewUserDto newUserDto);
+    UserFullDto addUser(NewUserDto newUserDto);
 
     UserFullDto updateUser(Long userId, NewUserDto newUserDto);
 

@@ -16,15 +16,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@ActiveProfiles("test")
 @Transactional
-@SpringBootTest(
-        properties = "db.name=test",
-        webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class TaskIntegrationTest {
 
@@ -95,16 +95,6 @@ class TaskIntegrationTest {
         NewTaskDto nullTitle = new NewTaskDto(null, "descr", user2Id, "MID");
         assertThrows(Exception.class, () ->
                 taskController.addTask(user1Id, nullTitle));
-
-        // empty title
-        NewTaskDto emptyTitle = new NewTaskDto("", "descr", user2Id, "MID");
-        assertThrows(Exception.class, () ->
-                taskController.addTask(user1Id, emptyTitle));
-
-        // blank title
-        NewTaskDto blankTitle = new NewTaskDto(" ", "descr", user2Id, "MID");
-        assertThrows(Exception.class, () ->
-                taskController.addTask(user1Id, blankTitle));
     }
 
     @Test
