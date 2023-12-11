@@ -29,6 +29,6 @@ public class Comment {
     @JoinColumn(name = "task_id", referencedColumnName = "id", nullable = false)
     private Task task;
 
-    @Column(name = "commentText", nullable = false)
+    @Column(name = "comment_text", nullable = false)
     private String commentText;
 }

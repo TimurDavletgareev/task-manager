@@ -16,4 +16,6 @@ public class NewCommentDto {
     @Size(min = 2, message = "size must be between 2 and 500")
     @Size(max = 500, message = "size must be between 2 and 500")
     private final String commentText;
+
+    private final String commentTitle;
 }
