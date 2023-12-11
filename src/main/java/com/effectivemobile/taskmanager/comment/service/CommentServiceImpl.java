@@ -11,15 +11,20 @@ import com.effectivemobile.taskmanager.task.model.Task;
 import com.effectivemobile.taskmanager.task.repisotory.TaskRepository;
 import com.effectivemobile.taskmanager.user.model.User;
 import com.effectivemobile.taskmanager.user.repository.UserRepository;
+import com.effectivemobile.taskmanager.util.PageRequestCreator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class CommentServiceImpl implements CommentService{
+public class CommentServiceImpl implements CommentService {
 
     private final UserRepository userRepository;
 
@@ -52,6 +57,26 @@ public class CommentServiceImpl implements CommentService{
         log.info("-- Комментарий пользователя с id={} к задаче с id={} сохранен", authorId, taskId);
 
         return dtoToReturn;
+    }
+
+    @Override
+    public List<CommentFullDto> getByTaskId(Long taskId, int from, int size) {
+
+        log.info("-- Получение списка комментариев к задаче с id={}", taskId);
+
+        if (!taskRepository.existsById(taskId)) {
+
+            throw new NotFoundException(String.format("- Задача с id=%d не найдена", taskId));
+        }
+
+        PageRequest pageRequest = PageRequestCreator.create(from, size, Sort.by("id"));
+
+        List<CommentFullDto> listToReturn =
+                CommentMapper.modelToFullDto(commentRepository.findByTaskId(taskId, pageRequest));
+
+        log.info("-- Список комментариев к задаче с id={} получен, его разер={}", taskId, listToReturn.size());
+
+        return listToReturn;
     }
 
     @Override
