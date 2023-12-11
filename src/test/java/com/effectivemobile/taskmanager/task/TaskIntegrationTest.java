@@ -5,6 +5,7 @@ import com.effectivemobile.taskmanager.error.exception.NotFoundException;
 import com.effectivemobile.taskmanager.task.controller.TaskController;
 import com.effectivemobile.taskmanager.task.dto.NewTaskDto;
 import com.effectivemobile.taskmanager.task.dto.TaskFullDto;
+import com.effectivemobile.taskmanager.task.dto.TaskShortDto;
 import com.effectivemobile.taskmanager.task.dto.TaskUpdateDto;
 import com.effectivemobile.taskmanager.task.model.TaskPriority;
 import com.effectivemobile.taskmanager.task.model.TaskStatus;
@@ -19,6 +20,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -31,9 +34,7 @@ class TaskIntegrationTest {
     private final UserService userService;
     private final TaskController taskController;
 
-    private static UserFullDto user1;
     private static Long user1Id;
-    private static UserFullDto user2;
     private static Long user2Id;
 
     private static NewTaskDto newTaskDto1;
@@ -48,14 +49,14 @@ class TaskIntegrationTest {
                 new NewUserDto("user1", "user1@mail.com",
                         "user1Password", "user1Password");
         userService.addUser(newUser1);
-        user1 = userService.getByName(newUser1.getName());
+        UserFullDto user1 = userService.getByName(newUser1.getName());
         user1Id = user1.getId();
 
         NewUserDto newUser2 =
                 new NewUserDto("user2", "user2@mail.com",
                         "user2Password", "user2Password");
         userService.addUser(newUser2);
-        user2 = userService.getByName(newUser2.getName());
+        UserFullDto user2 = userService.getByName(newUser2.getName());
         user2Id = user2.getId();
 
         newTaskDto1 = new NewTaskDto("task1", "descr1", user2Id, "MID");
@@ -98,7 +99,7 @@ class TaskIntegrationTest {
     }
 
     @Test
-    void update() {
+    void shouldUpdate() {
 
         TaskFullDto originalTask = taskController.addTask(user1Id, newTaskDto1);
         Long taskId = originalTask.getId();
@@ -132,22 +133,36 @@ class TaskIntegrationTest {
     }
 
     @Test
-    void setTaskStatusByExecutor() {
-    }
+    void shouldGetByAuthorId() {
 
-    @Test
-    void getById() {
-    }
+        TaskFullDto task1 = taskController.addTask(user1Id, newTaskDto1);
+        Long task1Id = task1.getId();
+        TaskFullDto task2 = taskController.addTask(user1Id, newTaskDto2);
+        Long task2Id = task2.getId();
+        TaskFullDto task3 = taskController.addTask(user1Id, newTaskDto3);
+        Long task3Id = task3.getId();
+        TaskFullDto task4 = taskController.addTask(user1Id, newTaskDto4);
+        Long task4Id = task4.getId();
 
-    @Test
-    void getByAuthorId() {
-    }
+        List<TaskShortDto> foundTasks
+                = taskController.getByAuthorId(
+                user1Id,
+                null,
+                null,
+                "MID",
+                0, 10, "status");
 
-    @Test
-    void getByExecutorId() {
-    }
+        assertEquals(2, foundTasks.size());
+        assertEquals(newTaskDto1.getTitle(), foundTasks.get(0).getTitle());
+        assertEquals(newTaskDto4.getTitle(), foundTasks.get(1).getTitle());
 
-    @Test
-    void removeById() {
+        foundTasks
+                = taskController.getByAuthorId(
+                user1Id,
+                null,
+                null,
+                null,
+                0, 10, "id");
+        assertEquals(4, foundTasks.size());
     }
 }
